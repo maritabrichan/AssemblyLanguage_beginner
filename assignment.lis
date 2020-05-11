@@ -1,0 +1,38 @@
+     1                                  ; Marita Brichan #ID 40138194
+     2                                  ; SOEN 228 section U (UA for tutorial and A-X for lab)
+     3                                  section .data
+     4                                  
+     5                                  
+     6 00000000 0F                      X db 15
+     7 00000001 04                      Y  db 4
+     8 00000002 00                      counter db 0
+     9                                  
+    10                                  section .bss
+    11                                  
+    12 00000000 <res 00000001>          quotient resb 1
+    13 00000001 <res 00000001>          remainder resb 1
+    14                                  
+    15                                  section .text
+    16                                          global _start
+    17                                  
+    18                                  _start:
+    19 00000000 803D[01000000]00                cmp byte [Y] , 0       ; compare divisor with 0,
+    20 00000007 742A                            je end                 ; if it's equal to 0, then the division is not valid, so just skip to the end to exit the program
+    21 00000009 A0[00000000]                    mov al, [X]            ; Assign al the value of X
+    22 0000000E 8A1D[01000000]                  mov bl, [Y]            ; Assign bl the value of Y
+    23 00000014 8A0D[02000000]                  mov cl, [counter]      ; Assign cl the calure of the couner
+    24                                  loop:
+    25 0000001A 38D8                            cmp al, bl             ; if X < Y then the subtraction result will be negative
+    26 0000001C 7C0A                            jl done                ; if so skip to done since now the X is the remainder
+    27 0000001E FEC1                            inc cl                 ; increment the quotient counter
+    28 00000020 28D8                            sub al, bl             ; subtract the Y from current X
+    29 00000022 38D8                            cmp al, bl             ; if X=Y, then the subtraction is equal to 0 with no remainder
+    30 00000024 7402                            je done                ; if so skip to done since the counter is now the quotient and remainder should be 0
+    31 00000026 EBF2                            jmp  loop              ; go back to the beginning of the loop
+    32 00000028 880D[00000000]          done:   mov [quotient] , cl    ; Assign quotient the value of cl, which is the counter
+    33 0000002E A2[01000000]                    mov [remainder], al    ; Assign remainder the value of al, which is what is left of the division
+    34                                  
+    35                                  end:
+    36 00000033 B801000000                      mov eax,1             ; The system call for exit (sys_exit)
+    37 00000038 BB00000000                      mov ebx,0             ; Exit with return code of 0 (no error)
+    38 0000003D CD80                            int 80h
